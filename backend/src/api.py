@@ -1,4 +1,5 @@
 import os
+import sys
 from flask import Flask, request, jsonify, abort
 from sqlalchemy import exc
 import json
@@ -20,13 +21,28 @@ CORS(app)
 
 ## ROUTES
 '''
-@TODO implement endpoint
     GET /drinks
         it should be a public endpoint
         it should contain only the drink.short() data representation
     returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
         or appropriate status code indicating reason for failure
 '''
+
+@app.route('/drinks', methods=['GET'])
+def get_drinks():
+    try: 
+        drinks = [drink.short() for drink in Drink.query.all()]
+        return json.dumps({
+            'success': True,
+            'drinks': drinks
+        })
+            
+    except:
+        print(sys.exc_info())
+        return json.dumps({
+            'success': False,
+            'error': 'Error while retrieving drinks'
+        }), 500
 
 
 '''
@@ -41,7 +57,6 @@ CORS(app)
 
 '''
 @TODO implement endpoint
-    POST /drinks
         it should create a new row in the drinks table
         it should require the 'post:drinks' permission
         it should contain the drink.long() data representation
@@ -49,6 +64,26 @@ CORS(app)
         or appropriate status code indicating reason for failure
 '''
 
+@app.route('/drinks', methods=['POST'])
+def create_drink():
+    body = request.get_json()
+    title = body.get('title', None)
+    recipe = body.get('recipe', None)
+
+    try:
+        drink = Drink(title=title, recipe=json.dumps(recipe))
+        drink.insert()
+
+        return jsonify({
+            "success": True, 
+            "drinks": drink.long()
+        })
+    except:
+        print(sys.exc_info())
+        return jsonify({
+            "success": False, 
+            'error': 'Error while saving drink'
+        })
 
 '''
 @TODO implement endpoint

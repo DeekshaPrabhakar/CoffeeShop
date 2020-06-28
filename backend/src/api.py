@@ -56,7 +56,7 @@ def get_drinks():
 
 
 '''
-@TODO implement endpoint
+    POST /drinks endpoint
         it should create a new row in the drinks table
         it should require the 'post:drinks' permission
         it should contain the drink.long() data representation
@@ -99,8 +99,7 @@ def create_drink():
 
 
 '''
-@TODO implement endpoint
-    DELETE /drinks/<id>
+    DELETE /drinks/<id> endpoint
         where <id> is the existing model id
         it should respond with a 404 error if <id> is not found
         it should delete the corresponding row for <id>
@@ -108,7 +107,24 @@ def create_drink():
     returns status code 200 and json {"success": True, "delete": id} where id is the id of the deleted record
         or appropriate status code indicating reason for failure
 '''
+@app.route('/drinks/<int:drink_id>', methods=['DELETE'])
+def delete_drink(drink_id):
+    try:
+        drink = Drink.query.filter(
+            Drink.id == drink_id).one_or_none()
+        
+        if drink:
+            drink.delete()
+        else:
+            abort(404)
 
+        return jsonify({
+            'success': True,
+            'delete': drink_id
+        })
+
+    except:
+        abort(422)
 
 ## Error Handling
 '''

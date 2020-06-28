@@ -61,7 +61,7 @@ def get_token_auth_header():
     return token
 
 '''
-@TODO implement check_permissions(permission, payload) method
+check_permissions(permission, payload) method
     @INPUTS
         permission: string permission (i.e. 'post:drink')
         payload: decoded jwt payload
@@ -72,7 +72,13 @@ def get_token_auth_header():
     return true otherwise
 '''
 def check_permissions(permission, payload):
-    raise Exception('Not Implemented')
+    if "permissions" in payload:
+        if permission in payload.get('permissions'):
+            return True
+    raise AuthError({
+        'code': 'invalid_access_request',
+        'description': 'You dont have permissions to access this resource'
+    }, 401)
 
 '''
 verify_decode_jwt(token) method

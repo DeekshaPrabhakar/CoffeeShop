@@ -52,7 +52,8 @@ def get_drinks():
         or appropriate status code indicating reason for failure
 '''
 @app.route('/drinks-detail', methods=['GET'])
-def get_drinks_detail():
+@requires_auth('get:drinks-detail')
+def get_drinks_detail(f):
     try: 
         drinks = [drink.long() for drink in Drink.query.all()]
         return json.dumps({
@@ -78,7 +79,8 @@ def get_drinks_detail():
 '''
 
 @app.route('/drinks', methods=['POST'])
-def create_drink():
+@requires_auth('post:drinks')
+def create_drink(f):
     body = request.get_json()
     title = body.get('title', None)
     recipe = body.get('recipe', None)
@@ -115,7 +117,8 @@ def create_drink():
         or appropriate status code indicating reason for failure
 '''
 @app.route('/drinks/<int:drink_id>', methods=['PATCH'])
-def update_drink(drink_id):
+@requires_auth('patch:drinks')
+def update_drink(f, drink_id):
     body = request.get_json()
     title = body.get('title', None)
     recipe = body.get('recipe', None)
@@ -163,7 +166,8 @@ def update_drink(drink_id):
         or appropriate status code indicating reason for failure
 '''
 @app.route('/drinks/<int:drink_id>', methods=['DELETE'])
-def delete_drink(drink_id):
+@requires_auth('delete:drinks')
+def delete_drink(f, drink_id):
     try:
         drink = Drink.query.filter(
             Drink.id == drink_id).one_or_none()
